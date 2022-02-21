@@ -1,0 +1,1107 @@
+<html>
+<!-- TO DO LIST:
+                -
+                -usunąć nieużywany kod
+                -
+				
+link do repozytorium skryptu JS https://leafletjs.com/
+dokumentacja: https://leafletjs.com/reference-1.6.0.html -->
+
+<head>
+
+    <title>Plany rozbudowy Metra w Warszawie</title>
+    <style>
+        body #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+    <!--mapa wyświetla się dopiero po dodaniu dwóch powyższych linijek -->
+
+</head>
+
+<body>
+    <div id='map'></div>
+    <script>
+        //-------------------------------- PODKŁAD --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        var map = L.map('map', {
+            center: [52.2350954, 21.0078988],
+            zoom: 11.5
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map); //linki do podkładu
+
+        /*        //---------------------TESTOWANIE WSPÓŁRZĘDNYCH--------------------------------------------------------------------------------------------------------------------------------
+                // UWAGA!   UWAGA!  UWAGA!  UWAGA!  UWAGA!  UWAGA!
+                // USUŃ TEN BLOK PO FINALIZACJI POPRAWEK
+
+                // funkcja odczytująca współrzędne z mapy
+                map.on('click', function(info) {
+                    alert(info.latlng.lat + ", " + info.latlng.lng)
+                }); //Autor: Marc Pfister
+        */
+        //---------------------------------- IKONY ---------------------------------------------------------------------------------------------------------
+        var Ico = L.Icon.extend({
+            options: {
+                iconSize: [20, 20]
+            }
+        });
+        var ikona1 = new Ico({
+                iconUrl: 'ico/ikona1.png'
+            }),
+            ikona2 = new Ico({
+                iconUrl: 'ico/ikona2.png'
+            }),
+            ikonaB = new Ico({
+                iconUrl: 'ico/ikonaB.png'
+            }),
+            ikonaP = new Ico({
+                iconUrl: 'ico/ikonaP.png'
+            });
+
+
+
+        //----------------------------------- OPISY -----------------------------------------------------
+
+        // Pierwsza linia
+        var opis1_1 = "<b>Kabaty</b><br> M1 (1995)";
+        var opis1_2 = "<b>Natolin</b><br> M1 (1995)";
+        var opis1_3 = "<b>Imielin</b><br> M1 (1995)";
+        var opis1_4 = "<b>Stokłosy</b><br> M1 (1995)";
+        var opis1_5 = "<b>Ursynów</b><br> M1 (1995)";
+        var opis1_6 = "<b>Służew</b><br> M1 (1995)";
+        var opis1_7 = "<b>Wilanowska</b><br> M1 (1995)";
+        var opis1_8 = "<b>Wierzbno</b><br> M1 (1995)";
+        //  opis1_9 = "<b>Racławicka</b><br> M1 (1995)";
+        var opis1_10 = "<b>Pole Mokotowskie</b><br> M1 (1995)";
+        var opis1_11 = "<b>Politechnika</b><br> M1 (1995)";
+        var opis1_12 = "<b>Plac Konstytucji</b><br> M1<br><i>Stacja planowana.</i>";
+        var opis1_13 = "<b> Centrum</b><br> M1 (1998)";
+        //  opis1_14 = "<b>Świętokrzyska</b><br> M1 (2001)";
+        //  opis1_15 = "<b>Ratusz Arsenał</b><br> M1 (2001)";
+        //  opis1_16 = "<b>Muranów</b><br> M1<br><i>Stacja planowana.</i>";
+        var opis1_17 = "<b>Dworzec Gdański</b><br> M1 (2003)";
+        var opis1_18 = "<b>Plac Wilsona</b><br> M1 (2005)";
+        var opis1_19 = "<b>Marymont</b><br> M1 (2006)";
+        var opis1_20 = "<b>Słodowiec</b><br> M1 (2008)";
+        var opis1_21 = "<b>Stare Bielany</b><br> M1 (2008)";
+        var opis1_22 = "<b>Wawrzyszew</b><br> M1 (2008)";
+        //  opis1_21 = "<b>Młociny</b><br> M1 (2008)";
+
+        // Druga linia
+        //  opis2_1 = "<b>Połczyńska</b><br> M2 (?)<br><i>Stacja planowana.</i>";
+        //  opis2_2 = "<b>M2 Chrzanów</b><br> M2 (?)<br><i>Stacja planowana.</i>";
+        //  opis2_3 = "<b>M2 Lazurowa</b><br> M2 (?)<br><i>Stacja planowana.</i>";
+        var opis2_4 = "<b>Powstańców Śląskich</b><br> M2 (2022)<br><i>Stacja w budowie.</i>";
+        var opis2_5 = "<b>Ulrychów</b><br>M2 (2022)<br><i>Stacja w budowie.</i>";
+        var opis2_6 = "<b>Księcia Janusza</b><br> M2 (2020)";
+        var opis2_7 = "<b>Młynów</b><br> M2 (2020)";
+        var opis2_8 = "<b>Płocka</b><br> M2 (2020)";
+        //  opis2_9 = "<b>Rondo daszyńskiego</b><br> M2 (2015)";
+        var opis2_10 = "<b>Rondo ONZ</b><br> M2 (2015)";
+        //  opis2_11 = "<b>Świętokrzyska</b><br> M2 (2015)";
+        //  opis2_12 = "<b>Nowy Świat - Uniwersytet</b><br> M2 (2015)";
+        var opis2_13 = "<b>Centrum Nauki Kopernik</b><br> M2(2015)";
+        //  opis2_14 = "<b>Stadion Narodowy</b><br> M2 (2015)";
+        var opis2_15 = "<b>Dworzec Wileński</b><br> M2 (2015)";
+        var opis2_16 = "<b>Szwedzka</b><br> M2 (2019)";
+        var opis2_17 = "<b>Targówek Mieszkaniowy</b><br> M2 (2019)";
+        var opis2_18 = "<b>Trocka</b><br> M2 (2019)";
+        var opis2_19 = "<b>Zacisze</b><br> M2 (2021)<br><i>Stacja w budowie.</i>";
+        var opis2_20 = "<b>Kondratowicza</b><br> M2 (2021)<br><i>Stacja w budowie.</i>";
+        //  opis2_21 = "<b>Bródno</b><br> M2 (2021)<br><i>Stacja w budowie.</i>";
+        var opis2_23 = "<b>Modlińska</b><br> M2 (?)<br><i>Stacja planowana.</i>";
+        //  opis2_34 = "<b>Tarchomin</b><br> M2 (?)<br><i>Stacja planowana.</i>";
+
+        //Trzecia linia
+        //  opis3_1 = "<b>Stadion Narodowy</b><br> M3(?)<br><i>Stacja planowana.</i>";
+        var opis3_2 = "<b>Dworzec Wschodni</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        var opis3_3 = "<b>Mińska</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        var opis3_4 = "<b>Rondo Wiatraczna</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        var opis3_5 = "<b>Ostrobramska</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        //  opis3_6 = "<b>Fieldorfa</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        var opis3_7 = "<b>Gocław</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        var opis3_8 = "<b>Zastów</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+        var opis3_9 = "<b>Zerzeń</b><br> M3 (?)<br><i>Stacja planowana.</i>";
+
+        //Czwarta linia
+        var opis4_1 = "<b>Lotnisko Okęcie</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        //  opis4_2 = "<b>Rakowiec</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_3 = "<b>Szpital Banacha</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_4 = "<b>Pomnik lotnika</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_5 = "<b>Plac Zawiszy</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        //  opis4_6 = "<b>Rondo Daszyńskiego</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_7 = "<b>Kercelak</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_8 = "<b>Jana Pawła</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        //  opis4_9 = "<b>Muranów</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_10 = "<b>Rondo Starzyńskiego</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_11 = "<b>Rondo żaba</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_12 = "<b>Cmentarz bródnowski</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        //  opis4_13 = "<b>Bródno</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_14 = "<b>Toruńska</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+        var opis4_15 = "<b>Derby</b><br> M4 (?)<br><i>Stacja planowana.</i>";
+
+        //Piąta linia
+        //  opis5_1 = "<b>Ursus</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        var opis5_2 = "<b>Salomea</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        var opis5_3 = "<b>Włochy</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        //  opis5_4 = "<b>Rakowiec</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        //  opis5_5 = "<b>Racławicka</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        //  opis5_6 = "<b>Mokotów</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        var opis5_7 = "<b>Siekierki</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        //  opis5_8 = "<b>Młociny</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        var opis5_9 = "<b>Witolin</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        var opis5_10 = "<b>Gocławek</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+        var opis5_11 = "<b>Rembertów</b><br> M5 (?)<br><i>Stacja planowana.</i>";
+
+
+        //Szósta linia
+        //  opis6_1 = "<b>Ursus</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        //  opis6_2 = "<b>Połczyńska</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        //  opis6_3 = "<b>Chrzanów</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        //  opis6_4 = "<b>Lazurowa</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        var opis6_5 = "<b>Wojskowa Akademia Techniczna</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        var opis6_6 = "<b>Bemowo</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        var opis6_7 = "<b>Conrada</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        //  opis6_8 = "<b>Młociny</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        var opis6_9 = "<b>Wrzeciono</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        var opis6_10 = "<b>Tarchomin</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+        var opis6_11 = "<b>Nowodwory</b><br> M6 (?)<br><i>Stacja planowana.</i>";
+
+
+        //Siódma linia
+        //  opis7_1 = "<b>Ratusz - Arsenał</b><br>M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_2 = "<b>Plac Piłsudzkiego</b><br>M7 (?)<br><i>Stacja planowana.</i>";
+        //  opis7_3 = "<b>Nowy Świat - Uniwersytet</b><br>M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_4 = "<b>Rondo gen. Charles’a de Gaulle’a</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_5 = "<b>Solec</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_6 = "<b>Łazienki Królewskie</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+        //  opis7_7 = "<b>Mokotów</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_8 = "<b>Sadyba</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_9 = "<b>Nałęczowska</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+        var opis7_10 = "<b>Wilanów</b><br> M7 (?)<br><i>Stacja planowana.</i>";
+
+
+        //Stacje przesiadkowe
+        var opis1_9_5_5 = "<b>Racławicka</b><br>M1 (1995) - M5 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis1_14_2_11 = "<b>Świętokrzyska</b><br>M1 (2001) - M2 (2015)<br><i>Stacja przesiadkowa</i>";
+        var opis1_15_7_1 = "<b>Ratusz - Arsenał</b><br>M1 (2001) - M7 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis1_16_3_9 = "<b>Muranów</b><br>M1 (?) - M4 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis1_23_6_8 = "<b>Młociny</b><br>M1 (2008) - M5 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis2_1_6_2 = "<b>Połczyńska</b><br>M2 (?) - M6 (?)<br><i>Stacja współdzielona</i>";
+        var opis2_2_6_3 = "<b>Chrzanów</b><br>M2 (?) - M6 (?)<br><i>Stacja współdzielona</i>";
+        var opis2_3_6_4 = "<b>Lazurowa</b><br>M2 (?) - M6 (?)<br><i>Stacja współdzielona</i>";
+        var opis2_9_4_6 = "<b>Rondo Daszyńskiego</b><br>M2 (2015) - M4 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis2_12_7_3 = "<b>Nowy Świat - Uniwersytet</b><br>M2 (2015) - M7 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis2_14_3_1 = "<b>Stadion Narodowy</b><br>M2 (2015) - M3 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis2_21_4_13 = "<b>Bródno</b><br>M2 (2021) - M4 (?)<br><i>Stacja w budowie.</i>";
+        var opis3_6_5_10 = "<b>Fieldorfa</b><br>M3 (?) - M5 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis4_2_5_4 = "<b>Rakowiec</b><br>M4 (?) - M5 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis5_1_6_1 = "<b>Ursus</b><br>M5 (?) - M6 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis5_6_7_6 = "<b>Mokotów</b><br>M5 (?) - M7 (?)<br><i>Stacja przesiadkowa</i>";
+        var opis2_24_6_10 = "<b>Tarchomin</b><br>M2 (?) - M6 (?)<br><i>Stacja przesiadkowa</i>";
+
+        //----------------------------------- PUNKTY ----------------------------------------------------------------------------
+
+        //Pierwsza linia
+        L.marker([52.1320899, 21.0651548], { //     1_1 kabaty
+            icon: ikona1
+        }).bindPopup(opis1_1).addTo(map);
+        L.marker([52.1411142, 21.0565392], { //     1_2 natolin
+            icon: ikona1
+        }).bindPopup(opis1_2).addTo(map);
+        L.marker([52.1493113, 21.0461775], { //     1_3 imielin
+            icon: ikona1
+        }).bindPopup(opis1_3).addTo(map);
+        L.marker([52.1561030, 21.0348241], { //     1_4 stokłosy
+            icon: ikona1
+        }).bindPopup(opis1_4).addTo(map);
+        L.marker([52.1620211, 21.0277181], { //     1_5 ursynów
+            icon: ikona1
+        }).bindPopup(opis1_5).addTo(map);
+        L.marker([52.17276050200281, 21.026281714439392], { //     1_6 służew
+            icon: ikona1
+        }).bindPopup(opis1_6).addTo(map);
+        L.marker([52.181691695902316, 21.02315425872803], { //     1_7 wilanowska
+            icon: ikona1
+        }).bindPopup(opis1_7).addTo(map);
+        L.marker([52.1899403545674, 21.016593575477604], { //     1_8 wierzbno
+            icon: ikona1
+        }).bindPopup(opis1_8).addTo(map);
+        L.marker([52.20853368937483, 21.007779836654667], { //     1_10 pole mokotowskie
+            icon: ikona1
+        }).bindPopup(opis1_10).addTo(map);
+        L.marker([52.21846010032958, 21.015343666076664], { //     1_11 politechnika
+            icon: ikona1
+        }).bindPopup(opis1_11).addTo(map);
+        L.marker([52.224677768099, 21.014758944511417], { //     1_12 plac konstytucji
+            icon: ikonaP
+        }).bindPopup(opis1_12).addTo(map);
+        L.marker([52.23115084169609, 21.010059714317325], { //     1_13 centrum
+            icon: ikona1
+        }).bindPopup(opis1_13).addTo(map);
+        L.marker([52.257893648809564, 20.99435269832611], { //     1_17 dworzec gdański
+            icon: ikona1
+        }).bindPopup(opis1_17).addTo(map);
+        L.marker([52.26924726493286, 20.984385609626774], { //     1_18 plac wilsona
+            icon: ikona1
+        }).bindPopup(opis1_18).addTo(map);
+        L.marker([52.27166003107804, 20.97172021865845], { //     1_19 marymont
+            icon: ikona1
+        }).bindPopup(opis1_19).addTo(map);
+        L.marker([52.27682323765093, 20.960234999656677], { //     1_20 słodowiec
+            icon: ikona1
+        }).bindPopup(opis1_20).addTo(map);
+        L.marker([52.28181190593774, 20.949361324310306], { //     1_21 stare bielany
+            icon: ikona1
+        }).bindPopup(opis1_21).addTo(map);
+        L.marker([52.286311071764224, 20.939598083496097], { //     1_22 wawrzyszew
+            icon: ikona1
+        }).bindPopup(opis1_22).addTo(map);
+
+
+
+        //Druga linia
+
+        L.marker([52.2390930, 20.9145963], { //     2_4 powstańców śląskich
+            icon: ikonaB
+        }).bindPopup(opis2_4).addTo(map);
+        L.marker([52.2405267, 20.9298428], { //     2_5 ulrychów
+            icon: ikonaB
+        }).bindPopup(opis2_5).addTo(map);
+        L.marker([52.2393568, 20.9423473], { //     2_6 księcia janusza
+            icon: ikona2
+        }).bindPopup(opis2_6).addTo(map);
+        L.marker([52.23778065636807, 20.96053004264832], { //     2_7 młynów
+            icon: ikona2
+        }).bindPopup(opis2_7).addTo(map);
+        L.marker([52.2330863, 20.9660913], { //     2_8 płocka
+            icon: ikona2
+        }).bindPopup(opis2_8).addTo(map);
+        L.marker([52.2331283, 20.9981863], { //     2_10 rondo onz
+            icon: ikona2
+        }).bindPopup(opis2_10).addTo(map);
+        L.marker([52.2399148, 21.0317878], { //     2_13 centrum nauki
+            icon: ikona2
+        }).bindPopup(opis2_13).addTo(map);
+        L.marker([52.2540622, 21.0355034], { //     2_15 dworzec wileński
+            icon: ikona2
+        }).bindPopup(opis2_15).addTo(map);
+        L.marker([52.2634539, 21.0453302], { //     2_16 szwedzka
+            icon: ikona2
+        }).bindPopup(opis2_16).addTo(map);
+        L.marker([52.2695853, 21.0514129], { //     2_17 targówek
+            icon: ikona2
+        }).bindPopup(opis2_17).addTo(map);
+        L.marker([52.2753464, 21.0554496], { //     2_18 trocka
+            icon: ikona2
+        }).bindPopup(opis2_18).addTo(map);
+        L.marker([52.282839108037166, 21.06257736682892], { //     2_19 zacisze
+            icon: ikonaB
+        }).bindPopup(opis2_19).addTo(map);
+        L.marker([52.29218128750876, 21.048463582992554], { //     2_20 kondratowicza
+            icon: ikonaB
+        }).bindPopup(opis2_20).addTo(map);
+        L.marker([52.308058799778266, 20.98350048065186], { // 2_23 Modlińska
+            icon: ikonaP
+        }).bindPopup(opis2_23).addTo(map);
+
+
+        //Trzecia linia
+        L.marker([52.2527204, 21.0509587], { //                     3_2 dworzec wschodni
+            icon: ikonaP
+        }).bindPopup(opis3_2).addTo(map);
+        L.marker([52.2500846, 21.0743799], { //                     3_3 mińska
+            icon: ikonaP
+        }).bindPopup(opis3_3).addTo(map);
+        L.marker([52.2453593, 21.0849402], { //                     3_4 rondo wiatraczna
+            icon: ikonaP
+        }).bindPopup(opis3_4).addTo(map);
+        L.marker([52.2347471, 21.0858966], { //                     3_5 ostrobramska
+            icon: ikonaP
+        }).bindPopup(opis3_5).addTo(map);
+        L.marker([52.2224474, 21.1025543], { //                      3_7 gocław
+            icon: ikonaP
+        }).bindPopup(opis3_7).addTo(map);
+        L.marker([52.213050152690016, 21.11181735992432], { //     3_8 zastów
+            icon: ikonaP
+        }).bindPopup(opis3_8).addTo(map);
+        L.marker([52.19705967666847, 21.133468151092533], { //     3_9 zerzeń
+            icon: ikonaP
+        }).bindPopup(opis3_9).addTo(map);
+
+
+        //Czwarta linia
+        L.marker([52.17422119559575, 20.98199844360352], { //     4_1 okęcie
+            icon: ikonaP
+        }).bindPopup(opis4_1).addTo(map);
+        L.marker([52.2092634547226, 20.987620353698734], { //     4_3 szpital banacha
+            icon: ikonaP
+        }).bindPopup(opis4_3).addTo(map);
+        L.marker([52.215981992248146, 20.988940000534058], { //     4_4 pomnik lotnika
+            icon: ikonaP
+        }).bindPopup(opis4_4).addTo(map);
+        L.marker([52.2243688770376, 20.989401340484623], { //     4_5 plac zawiszy
+            icon: ikonaP
+        }).bindPopup(opis4_5).addTo(map);
+        L.marker([52.23783650292984, 20.9797078371048], { //     4_7 kercelak
+            icon: ikonaP
+        }).bindPopup(opis4_7).addTo(map);
+        L.marker([52.247178314995466, 20.98819434642792], { //     4_8 Jana Pawła
+            icon: ikonaP
+        }).bindPopup(opis4_8).addTo(map);
+        L.marker([52.264480434828755, 21.021802425384525], { //     4_10 rondo starzyńskiego
+            icon: ikonaP
+        }).bindPopup(opis4_10).addTo(map);
+        L.marker([52.268009645494104, 21.0339367389679], { //     4_11 rondo żaba
+            icon: ikonaP
+        }).bindPopup(opis4_11).addTo(map);
+        L.marker([52.28129993689444, 21.025477051734928], { //     4_12 cmentarz bródnowski
+            icon: ikonaP
+        }).bindPopup(opis4_12).addTo(map);
+        L.marker([52.30323053893957, 21.04680061340332], { //     4_14 toruńska
+            icon: ikonaP
+        }).bindPopup(opis4_14).addTo(map);
+        L.marker([52.31558878593861, 21.060662269592285], { //     4_15 derby
+            icon: ikonaP
+        }).bindPopup(opis4_14).addTo(map);
+
+
+
+        //Piąta linia
+        L.marker([52.188259830931585, 20.920243263244632], { //  5_2 salomea
+            icon: ikonaP
+        }).bindPopup(opis5_2).addTo(map);
+        L.marker([52.19024619645952, 20.958137512207035], { // 5_3 włochy
+            icon: ikonaP
+        }).bindPopup(opis5_3).addTo(map);
+        L.marker([52.2092634547226, 21.066584587097168], { // 5_7 siekierki
+            icon: ikonaP
+        }).bindPopup(opis5_7).addTo(map);
+        L.marker([52.2366702807286, 21.10836267471314], { // 5_9 witolin
+            icon: ikonaP
+        }).bindPopup(opis5_9).addTo(map);
+        L.marker([52.237182765244796, 21.1422872543335], { // 5_10 gocławek
+            icon: ikonaP
+        }).bindPopup(opis5_10).addTo(map);
+        L.marker([52.25671846617958, 21.173411607742313], { // 5_11 rembertów
+            icon: ikonaP
+        }).bindPopup(opis5_11).addTo(map);
+
+
+
+        //Szósta linia
+        L.marker([52.25218673968776, 20.913462638854984], { // 6_5 wat
+            icon: ikonaP
+        }).bindPopup(opis6_5).addTo(map);
+        L.marker([52.262247858841576, 20.926165580749515], { // 6_6 bemowo
+            icon: ikonaP
+        }).bindPopup(opis6_6).addTo(map);
+        L.marker([52.2770595556613, 20.923204421997074], { // 6_7 conrada
+            icon: ikonaP
+        }).bindPopup(opis6_7).addTo(map);
+        L.marker([52.293939903897055, 20.942194461822513], { // 6_9 wrzeciono
+            icon: ikonaP
+        }).bindPopup(opis6_9).addTo(map);
+        L.marker([52.31936641488024, 20.950841903686527], { // 6_10 tarchomin
+            icon: ikonaP
+        }).bindPopup(opis6_10).addTo(map);
+        L.marker([52.33234955510532, 20.94148635864258], { // 6_11 nowodwory
+            icon: ikonaP
+        }).bindPopup(opis6_11).addTo(map);
+
+
+        //Siódma linia
+        L.marker([52.24136126431274, 21.0139274597168], { // 7_2 Plac Piułsudzkiego
+            icon: ikonaP
+        }).bindPopup(opis7_2).addTo(map);
+        L.marker([52.23172910082567, 21.020772457122806], { // 7_4 rondo de gaula
+            icon: ikonaP
+        }).bindPopup(opis7_4).addTo(map);
+        L.marker([52.22835143532774, 21.03240251541138], { // 7_5 solec
+            icon: ikonaP
+        }).bindPopup(opis7_5).addTo(map);
+        L.marker([52.217073165628314, 21.03763818740845], { // 7_6 łazienki
+            icon: ikonaP
+        }).bindPopup(opis7_6).addTo(map);
+        L.marker([52.18960162399487, 21.053795814514164], { // 7_8 sadyba
+            icon: ikonaP
+        }).bindPopup(opis7_8).addTo(map);
+        L.marker([52.177708243123874, 21.068043708801273], { // 7_9 nałęczowska
+            icon: ikonaP
+        }).bindPopup(opis7_9).addTo(map);
+        L.marker([52.16482454474455, 21.074438095092773], { // 7_10 wilanów
+            icon: ikonaP
+        }).bindPopup(opis7_10).addTo(map);
+
+
+
+        //Stacje przesiadkowe
+
+        L.marker([52.19893714620853, 21.01220011711121], { //     1_9_5_5 racławicka
+            icon: ikona1
+        }).bindPopup(opis1_9_5_5).addTo(map);
+        L.marker([52.2350954, 21.0078988], { //                    1_14_2_11 świętokrzyska
+            icon: ikona1
+        }).bindPopup(opis1_14_2_11).addTo(map);
+        L.marker([52.24499413636591, 21.00115478038788], { //       1_15_7_1 ratusz arsenał
+            icon: ikona1
+        }).bindPopup(opis1_15_7_1).addTo(map);
+        L.marker([52.25064978817916, 20.998569130897526], { //     1_16_3_9 muranów
+            icon: ikonaP
+        }).bindPopup(opis1_16_3_9).addTo(map);
+        L.marker([52.29075728203807, 20.929861664772037], { //     1_23_6_8 Młociny
+            icon: ikona1
+        }).bindPopup(opis1_23_6_8).addTo(map);
+        L.marker([52.2166518, 20.8862065], { // 2_1_6_2 Połczyńska
+            icon: ikonaP
+        }).bindPopup(opis2_1_6_2).addTo(map);
+        L.marker([52.2272285, 20.8894965], { // 2_2_6_3 chrzanów
+            icon: ikonaP
+        }).bindPopup(opis2_2_6_3).addTo(map);
+        L.marker([52.2384690, 20.8988070], { // 2_3_6_4 Lazurowa
+            icon: ikonaP
+        }).bindPopup(opis2_3_6_4).addTo(map);
+        L.marker([52.23029658147186, 20.984380245208744], { //      2_9_4_6 rondo daszyńskiego
+            icon: ikona2
+        }).bindPopup(opis2_9_4_6).addTo(map);
+        L.marker([52.2368330, 21.0167880], { // 2_12_7_3 nowy świat     
+            icon: ikona2
+        }).bindPopup(opis2_12_7_3).addTo(map);
+        L.marker([52.2469807, 21.0428754], { //  2_14_3_1 stadion  
+            icon: ikona2
+        }).bindPopup(opis2_14_3_1).addTo(map);
+        L.marker([52.29367414731686, 21.028089523315433], { //     2_21_4_13 bródno
+            icon: ikonaB
+        }).bindPopup(opis2_21_4_13).addTo(map);
+        L.marker([52.2251881, 21.0918865], { //   3_6_5_10  fieldorfa
+            icon: ikonaP
+        }).bindPopup(opis3_6_5_10).addTo(map);
+        L.marker([52.19829598776966, 20.983843803405765], { //     4_2_5_4 rakowiec
+            icon: ikonaP
+        }).bindPopup(opis4_2_5_4).addTo(map);
+        L.marker([52.19665194950946, 20.8835506439209], { //     5_1_5_1 ursus
+            icon: ikonaP
+        }).bindPopup(opis5_1_6_1).addTo(map);
+        L.marker([52.20179429880062, 21.03542804718018], { // 5_6_7_6 mokotów    
+            icon: ikonaP
+        }).bindPopup(opis5_6_7_6).addTo(map);
+        L.marker([52.31936641488024, 20.950841903686527], { // 2_24_6_10 Tarchomin
+            icon: ikonaP
+        }).bindPopup(opis2_24_6_10).addTo(map);
+
+        //----------------------------------- LINIE --------------------------------------------------------------------
+        // wyznaczanie linii
+        var M1 = [
+            [
+                [52.1320899, 21.0651548], //            1_1 kabaty
+                [52.1411142, 21.0565392], //            1_2 natolin
+                [52.145393243265964, 21.051864624023438],
+                [52.1493113, 21.0461775], //            1_3 imielin
+                [52.1561030, 21.0348241], //            1_4 stokłosy
+                [52.15742690550189, 21.032509803771976],
+                [52.158585335903176, 21.030471324920654],
+                [52.159296175995465, 21.02944135665894],
+                [52.1597174092116, 21.028990745544437],
+                [52.16017812847701, 21.028518676757816],
+                [52.161099552700385, 21.02796077728272],
+                [52.1620211, 21.0277181], //            1_5 ursynów
+                [52.16253759452925, 21.027553081512455],
+                [52.16617691611746, 21.027075648307804],
+                [52.16858212714756, 21.026780605316166],
+                [52.16978632896984, 21.026619672775272],
+                [52.17050357030525, 21.026517748832706],
+                [52.17276050200281, 21.026281714439392], //1_6 służew
+                [52.17445806030762, 21.02619051933289],
+                [52.177869430220106, 21.027477979660038],
+                [52.17817864464715, 21.027488708496097],
+                [52.178339830038674, 21.02746188640595],
+                [52.17846812003488, 21.027376055717472],
+                [52.1786095675505, 21.027274131774906],
+                [52.181691695902316, 21.02315425872803], //1_7 wilanów
+                [52.18392503644632, 21.020300388336185],
+                [52.18473085343644, 21.019570827484134],
+                [52.18894059864936, 21.01718902587891],
+                [52.1899403545674, 21.016593575477604], //1_8 wierzbno
+                [52.19893714620853, 21.01220011711121], //1_9 racławicka
+                [52.20853368937483, 21.007779836654667], //1_10 pole mokotowskie
+                [52.20973023528096, 21.007318496704105],
+                [52.21001293098111, 21.007313132286075],
+                [52.21051586190781, 21.00722193717957],
+                [52.21084457185515, 21.007549166679386],
+                [52.211100963925674, 21.007795929908756],
+                [52.216267934852354, 21.014512181282047],
+                [52.21650457561544, 21.014678478240967],
+                [52.2170370127228, 21.01489841938019],
+                [52.21744126626384, 21.015032529830936],
+                [52.21846010032958, 21.015343666076664], //1_11 politechnika
+                [52.21992586575965, 21.0156387090683],
+                [52.22033337939239, 21.01570308208466],
+                [52.22161833741036, 21.015901565551758],
+                [52.2219831141131, 21.01596593856812],
+                [52.22246947838909, 21.01591765880585],
+                [52.223001843990176, 21.01572990417481],
+                [52.22329431373374, 21.015617251396183],
+                [52.22377409138843, 21.015311479568485],
+                [52.224677768099, 21.014758944511417], //1_12 plac konstytucji
+                [52.22783227718525, 21.012892127037052],
+                [52.22821343185693, 21.012618541717533],
+                [52.22843358004717, 21.012377142906193],
+                [52.22885744438404, 21.012001633644108],
+                [52.22999430083975, 21.011014580726624],
+                [52.23115084169609, 21.010059714317325], //1_13 centrum
+                [52.232136506144016, 21.009544730186466],
+                [52.23389750547675, 21.00856840610504],
+                [52.2350954, 21.0078988], //            1_14 świętokrzyska
+                [52.235796415277875, 21.007479429245],
+                [52.23673926937353, 21.0069215297699],
+                [52.23799747203818, 21.00620806217194],
+                [52.238592067152695, 21.005859375000004],
+                [52.23920307924755, 21.005516052246094],
+                [52.240303536801406, 21.004872322082523],
+                [52.24145323942664, 21.00419104099274],
+                [52.24254050221971, 21.003300547599796],
+                [52.24325328542478, 21.002597808837894],
+                [52.24431751185003, 21.00169658660889],
+                [52.24499413636591, 21.00115478038788], //1_15 ratusz
+                [52.2465706971494, 21.000001430511478],
+                [52.24740822228076, 20.999556183815006],
+                [52.24850190776675, 20.99916994571686],
+                [52.25064978817916, 20.998569130897526], //1_16 muranów
+                [52.25118509998311, 20.998408198356632],
+                [52.254393551292516, 20.997619628906254],
+                [52.254748207203065, 20.99740505218506],
+                [52.254971507617896, 20.9972494840622],
+                [52.25527361815448, 20.99692761898041],
+                [52.25608799282941, 20.99597811698914],
+                [52.257086238161754, 20.994835495948795],
+                [52.25726355570639, 20.994701385498047],
+                [52.257893648809564, 20.99435269832611], //1_17 dworzec gdański
+                [52.25880356160217, 20.993864536285404],
+                [52.2590038569466, 20.993821620941166],
+                [52.25962115494088, 20.993773341178898],
+                [52.260727672924894, 20.99369287490845],
+                [52.26091810943711, 20.993623137474064],
+                [52.261331813524826, 20.993290543556217],
+                [52.261765213667665, 20.99292039871216],
+                [52.262182193140234, 20.992577075958256],
+                [52.2626352845, 20.992153286933902],
+                [52.26317373487844, 20.9916490316391],
+                [52.264559229574616, 20.990307927131656],
+                [52.265156751840316, 20.989766120910648],
+                [52.268636666556894, 20.986595749855045],
+                [52.26869903989492, 20.98648846149445],
+                [52.268817220715825, 20.98622560501099],
+                [52.268925552858214, 20.98588764667511],
+                [52.26924726493286, 20.984385609626774], //1_18 plac wilsona
+                [52.269467209599426, 20.983398556709293],
+                [52.26967402224568, 20.982486605644226],
+                [52.26967402224568, 20.98247051239014],
+                [52.2705833298943, 20.97827553749085],
+                [52.27087876879812, 20.976837873458866],
+                [52.27117748835453, 20.975153446197513],
+                [52.27135474955722, 20.974295139312748],
+                [52.27166003107804, 20.97172021865845], //1_19 marymont
+                [52.272050657054606, 20.969864130020145],
+                [52.272529907752066, 20.9679651260376],
+                [52.27295335097452, 20.966806411743168],
+                [52.27356388989526, 20.965470671653748],
+                [52.27381663741733, 20.965057611465458],
+                [52.274164573206974, 20.964515805244446],
+                [52.27522149347865, 20.963104963302616],
+                [52.27574337959734, 20.962348580360416],
+                [52.27682323765093, 20.960234999656677], //1_20 słodowiec
+                [52.28181190593774, 20.949361324310306], //1_21 stare bielany
+                [52.286311071764224, 20.939598083496097], //1_22 wawrzyszew
+                [52.29075728203807, 20.929861664772037] //1_23 młociny
+            ]
+        ];
+        var M2 = [
+            [
+                [52.2393568, 20.9423473], //            2_6 księcia janusza
+                [52.23902897450763, 20.94574570655823],
+                [52.23877931368863, 20.948159694671634],
+                [52.238605207286255, 20.950106978416446],
+                [52.23844752542679, 20.95175385475159],
+                [52.238283272894094, 20.95350801944733],
+                [52.238181436018564, 20.95472037792206],
+                [52.23810587947606, 20.955675244331363],
+                [52.23805988847415, 20.956394076347355],
+                [52.238004042193474, 20.95718801021576],
+                [52.23796462124716, 20.958137512207035],
+                [52.23778065636807, 20.96053004264832], //2_7 młynów
+                [52.23772152463787, 20.961345434188846],
+                [52.23745214575882, 20.962407588958744],
+                [52.23709078128021, 20.96320152282715],
+                [52.236716273170465, 20.963952541351322],
+                [52.2361906424233, 20.964585542678837],
+                [52.23569785794441, 20.9649932384491],
+                [52.23494224445075, 20.965400934219364],
+                [52.2330863, 20.9660913], //            2_8 płocka
+                [52.23151882565007, 20.966613292694095],
+                [52.23088142293849, 20.966838598251346],
+                [52.23056600377878, 20.96703171730042],
+                [52.23006658552596, 20.96753597259522],
+                [52.22971173230064, 20.96798658370972],
+                [52.22938316197042, 20.96848011016846],
+                [52.22918601860504, 20.968898534774784],
+                [52.229074303642754, 20.96923112869263],
+                [52.22890344492138, 20.969874858856205],
+                [52.22883772985345, 20.97021818161011],
+                [52.22877858620917, 20.97103357315064],
+                [52.229343733367365, 20.97865104675293],
+                [52.2299789, 20.9828873], //            2_9 rondo daszyńskiego
+                [52.2331283, 20.9981863], //            2_10 rondo onz
+                [52.2350954, 21.0078988], //            2_11 świętokrzyska
+                [52.2368330, 21.0167880], //            2_12 nowy świat
+                [52.23741929456415, 21.020171642303467],
+                [52.23765582262301, 21.021555662155155],
+                [52.237774086179705, 21.022306680679325],
+                [52.237918630098896, 21.02305769920349],
+                [52.238306268285285, 21.025310754776005],
+                [52.23870704318942, 21.027810573577884],
+                [52.23924578407945, 21.029870510101322],
+                [52.238917284314844, 21.028819084167484],
+                [52.23952172200268, 21.03066444396973],
+                [52.2399148, 21.0317878], //            2_13 centrum nauki
+                [52.24031010661533, 21.032810211181644],
+                [52.24078970040323, 21.033979654312137],
+                [52.24363430769546, 21.041060686111454],
+                [52.24407445003901, 21.041790246963505],
+                [52.24444889605842, 21.042208671569828],
+                [52.244941583375024, 21.042562723159794],
+                [52.24551309380873, 21.042798757553104],
+                [52.245907234646474, 21.04286313056946],
+                [52.2469807, 21.0428754], //            2_14 stadion
+                [52.24737209407198, 21.04286313056946],
+                [52.247956710564225, 21.042820215225223],
+                [52.24825886887758, 21.042745113372806],
+                [52.24863327958495, 21.04263782501221],
+                [52.24909307788518, 21.04239106178284],
+                [52.24966453484508, 21.04192972183228],
+                [52.249894429246865, 21.04162931442261],
+                [52.25035421447649, 21.040803194046024],
+                [52.25099790579228, 21.039601564407352],
+                [52.251247497871184, 21.03911876678467],
+                [52.251221225086915, 21.039193868637085],
+                [52.25153649747132, 21.03861451148987],
+                [52.25197656142799, 21.037809848785404],
+                [52.25225898823458, 21.03740215301514],
+                [52.2540622, 21.0355034], //             2_15 dworzec wileński
+                [52.25604858794747, 21.033604145050052],
+                [52.25644263519164, 21.03344321250916],
+                [52.25644263519164, 21.033368110656742],
+                [52.256862948393405, 21.03338956832886],
+                [52.25758535240261, 21.033604145050052],
+                [52.25857042981614, 21.034290790557865],
+                [52.259253403978946, 21.035041809082035],
+                [52.25987069849973, 21.03605031967163],
+                [52.26057991989514, 21.03789567947388],
+                [52.26174879707278, 21.04115724563599],
+                [52.2634539, 21.0453302], //            2_16 szwedzka
+                [52.26485470862449, 21.048506498336796],
+                [52.26526837598632, 21.049246788024902],
+                [52.26548505734989, 21.04962229728699],
+                [52.26570830370787, 21.049944162368774],
+                [52.26625328274271, 21.050437688827518],
+                [52.266712898408464, 21.050791740417484],
+                [52.26722503596635, 21.051017045974735],
+                [52.26780939082558, 21.05117797851563],
+                [52.2683346470473, 21.051253080368042],
+                [52.2695853, 21.0514129], //            2_17 targówek
+                [52.270442175056274, 21.05152130126953],
+                [52.27113153163071, 21.05158567428589],
+                [52.27174866080318, 21.0517680644989],
+                [52.272241044938326, 21.052047014236454],
+                [52.27251677766499, 21.052229404449466],
+                [52.27283189868102, 21.05242252349854],
+                [52.27347526379951, 21.053012609481815],
+                [52.2738363319689, 21.05340957641602],
+                [52.274263045104405, 21.053860187530518],
+                [52.2753464, 21.0554496] //             2_18 trocka
+            ]
+        ];
+        var M2_B = [
+            [
+                [52.2390930, 20.9145963], //            2_4 powstańców śląskich
+                [52.239626840760245, 20.918215513229374],
+                [52.24056632859891, 20.925189256668094],
+                [52.24069772391408, 20.927453041076664],
+                [52.2405267, 20.9298428], //            2_5 ulrychów
+                [52.23990277631419, 20.935435295104984],
+                [52.2393568, 20.9423473] //             2_6 księcia janusza
+            ],
+            [
+                [52.2753464, 21.0554496], //            2_18 trocka
+                [52.27743372326741, 21.058677434921268],
+                [52.27781445197495, 21.059235334396366],
+                [52.27820830581679, 21.059707403182983],
+                [52.28107676905007, 21.062228679656982],
+                [52.281162098064456, 21.06231451034546],
+                [52.2815690495649, 21.062593460083008],
+                [52.28153623103404, 21.062550544738773],
+                [52.28179877860028, 21.062668561935425],
+                [52.28204819734732, 21.062711477279667],
+                [52.28231730547358, 21.062722206115726],
+                [52.28256672130202, 21.06264710426331],
+                [52.282839108037166, 21.06257736682892], //2_19 zacisze
+                [52.28304257655403, 21.062491536140442],
+                [52.28440776050169, 21.061933636665348],
+                [52.285346300066685, 21.061633229255676],
+                [52.285516941488034, 21.061515212059025],
+                [52.2872036309524, 21.0603404045105],
+                [52.28935291844622, 21.058816909790043],
+                [52.290334008913646, 21.05810880661011],
+                [52.290734313832765, 21.057722568511966],
+                [52.29113789627779, 21.057282686233524],
+                [52.291515226132134, 21.056531667709354],
+                [52.29167271938142, 21.056011319160465],
+                [52.291790838950945, 21.055426597595215],
+                [52.29187942842138, 21.054734587669373],
+                [52.29211238507221, 21.052524447441105],
+                [52.29212879042394, 21.05053424835205],
+                [52.29218128750876, 21.048463582992554], //2_20 kondratowicza
+                [52.292214098155206, 21.047390699386597],
+                [52.29225018983819, 21.046301722526554],
+                [52.29227643831646, 21.045277118682865],
+                [52.292348621551454, 21.044332981109623],
+                [52.29257829469839, 21.04167759418488],
+                [52.29280468563492, 21.038968563079838],
+                [52.29301467039677, 21.03638291358948],
+                [52.2933033978189, 21.032541990280155],
+                [52.2935100992492, 21.029827594757084],
+                [52.29367414731686, 21.028089523315433] //2_21 bródno
+            ]
+        ];
+        var M2_P = [
+            [
+                [52.2166518, 20.8862065], //            2_1 Połczyńska
+                [52.218558695934355, 20.88634014129639],
+                [52.2216873494488, 20.886769294738773],
+                [52.2272285, 20.8894965], //            2_2 chrzanów
+                [52.23172910082567, 20.891447067260746],
+                [52.23586869051667, 20.894408226013187],
+                [52.23793834059684, 20.897476673126224],
+                [52.2384690, 20.8988070], //            2_3 lazurowa
+                [52.238759603564155, 20.89951515197754],
+                [52.23896327442826, 20.90130686759949],
+                [52.239009264494044, 20.903452634811405],
+                [52.238713613239675, 20.907969474792484],
+                [52.23878588372818, 20.911982059478763],
+                [52.2390930, 20.9145963] //             2_4 powstańców śląskich
+            ],
+            [
+                [
+                    [52.29367414731686, 21.028089523315433], //     2_21_3_13 bródno
+                    [52.2942811198843, 21.016888618469242],
+                    [52.295803436109615, 21.00723266601563],
+                    [52.29811305736229, 20.994830131530765],
+                    [52.3036504086106, 20.98920822143555],
+                    [52.308058799778266, 20.98350048065186], //     2_23 Modlińska
+                    [52.30860981781096, 20.982642173767093],
+                    [52.30931825948968, 20.972042083740238],
+                    [52.31060392098622, 20.961173772811893],
+                    [52.31604789000184, 20.953674316406254],
+                    [52.318749948841464, 20.95202207565308],
+                    [52.31936641488024, 20.950841903686527], //     2_24 tarchomin
+                ]
+            ],
+        ];
+        M3_P = [
+            [
+                [52.2469807, 21.0428754], //            3_1 stadion
+                [52.24896827596059, 21.044182777404785],
+                [52.25037391945126, 21.046049594879154],
+                [52.2516875646948, 21.048238277435306],
+                [52.2527204, 21.0509587], //            3_2 dworzec wschodni
+                [52.25436728037152, 21.056799888610843],
+                [52.254564311899735, 21.058838367462158],
+                [52.254380415833964, 21.060705184936527],
+                [52.2538024518066, 21.063387393951416],
+                [52.25209478682164, 21.067485809326172],
+                [52.25174010969541, 21.068537235260013],
+                [52.25103074693554, 21.07001781463623],
+                [52.250610378465936, 21.071519851684574],
+                [52.2500846, 21.0743799], //            3_3 mińska
+                [52.25043960263734, 21.07978105545044],
+                [52.249861587262394, 21.082677841186527],
+                [52.2480618093414, 21.0843300819397],
+                [52.2453593, 21.0849402], //            3_4 rondo wiatraczna
+                [52.241716024416, 21.083621978759766],
+                [52.240086732397, 21.08379364013672],
+                [52.238812163876624, 21.084673404693604],
+                [52.236617717879525, 21.08611106872559],
+                [52.2347471, 21.0858966], //            3_5 ostrobramska
+                [52.23333241628797, 21.085875034332275],
+                [52.231361118614714, 21.088171005249027],
+                [52.23012572745442, 21.08838558197022],
+                [52.22816743060465, 21.089437007904056],
+                [52.22618275976436, 21.089909076690674],
+                [52.2251881, 21.0918865], //            3_6 fieldorfa
+                [52.223803666553685, 21.098213195800785],
+                [52.2224474, 21.1025543], //             3_7 gocław
+                [52.22100379690994, 21.106753349304203],
+                [52.213050152690016, 21.11181735992432], // 3_8 zastów
+                [52.204319224372654, 21.11735343933106],
+                [52.197954032820384, 21.130399703979496],
+                [52.19705967666847, 21.133468151092533], // 3_9 zerzeń
+            ]
+        ];
+        M4_P = [
+            [
+                [52.17422119559575, 20.98199844360352], //      4_1 okęcie
+                [52.17737928805376, 20.979166030883793],
+                [52.181195017296446, 20.97800731658936],
+                [52.19829598776966, 20.983843803405765], //     4_2 rakowiec
+                [52.2092634547226, 20.987620353698734], //      4_3 szpital banacha
+                [52.212774050206036, 20.98869323730469],
+                [52.21450952302601, 20.98871469497681],
+                [52.215981992248146, 20.988940000534058], //    4_4 pomnik lotnika
+                [52.219176556740635, 20.98968029022217],
+                [52.22318587012094, 20.99000215530396],
+                [52.22375108846848, 20.989916324615482],
+                [52.2243688770376, 20.989401340484623], //      4_5 plac zawiszy
+                [52.22514438669145, 20.988864898681644],
+                [52.226958237738515, 20.98744869232178],
+                [52.23029658147186, 20.984380245208744], //    2_9_4_6 rondo daszyńskiego
+                [52.23235992037639, 20.98268508911133],
+                [52.23513279167507, 20.980818271636966],
+                [52.23783650292984, 20.9797078371048], //       4_7 kercelak
+                [52.23832597861108, 20.979670286178592],
+                [52.23924578407945, 20.97960591316223],
+                [52.239866641994034, 20.979380607604984],
+                [52.24264232909285, 20.978318452835087],
+                [52.24370000085975, 20.978543758392338],
+                [52.24440948083675, 20.97926259040833],
+                [52.244810200625516, 20.980356931686405],
+                [52.244810200625516, 20.980356931686405],
+                [52.247178314995466, 20.98819434642792], //     4_8 Jana Pawła
+                [52.24821945704038, 20.991579294204715],
+                [52.248981413021816, 20.995355844497684],
+                [52.24937223881395, 20.99740505218506],
+                [52.24963826112329, 20.998048782348636],
+                [52.25001266018962, 20.99841356277466],
+                [52.25064978817916, 20.998569130897526], //     1_16_4_9 muranów
+                [52.250689197857405, 20.998606681823734],
+                [52.25126063425749, 20.99844574928284],
+                [52.25439026742823, 20.99767863750458],
+                [52.25489269583515, 20.99771082401276],
+                [52.25559214551344, 20.998080968856815],
+                [52.25829461034588, 21.002275943756107],
+                [52.26004143802044, 21.00667476654053],
+                [52.264480434828755, 21.021802425384525], //    4_10 rondo starzyńskiego
+                [52.268009645494104, 21.0339367389679], //      4_11 rondo żaba
+                [52.26830181871575, 21.034805774688724],
+                [52.26937200980307, 21.035084724426273],
+                [52.271413836467254, 21.034290790557865],
+                [52.276665691610624, 21.02890491485596],
+                [52.28129993689444, 21.025477051734928], //     4_12 cmentarz bródnowski
+                [52.285251134373176, 21.02263927459717],
+                [52.29000260620264, 21.02384090423584],
+                [52.29367414731686, 21.028089523315433], //     2_21_4_13 bródno
+                [52.29542286195858, 21.029570102691654],
+                [52.2972600862679, 21.031608581542972],
+                [52.29896601202841, 21.034365892410282],
+                [52.29966804700505, 21.036801338195804],
+                [52.300448801804805, 21.04115724563599],
+                [52.30117049567907, 21.042959690093998],
+                [52.30323053893957, 21.04680061340332], //      4_14 toruńska
+                [52.30505431890894, 21.050040721893314],
+                [52.3075340143232, 21.059031486511234],
+                [52.30845238478718, 21.06074810028076],
+                [52.313148895869034, 21.060919761657715],
+                [52.31558878593861, 21.060662269592285], //     4_15 derby
+            ]
+        ];
+        M5_P = [
+            [
+                [52.19665194950946, 20.8835506439209], //       ursus
+                [52.195908824260606, 20.884795188903812],
+                [52.1884308460246, 20.90582370758057],
+                [52.18774678170579, 20.91178894042969],
+                [52.188259830931585, 20.920243263244632], //    salomea
+                [52.18812828041242, 20.923376083374027],
+                [52.18498410718892, 20.940928459167484],
+                [52.185365629599374, 20.946657657623295],
+                [52.18666804351153, 20.95174312591553],
+                [52.189180673667565, 20.957129001617435],
+                [52.19024619645952, 20.958137512207035], //     włochy
+                [52.196112691715996, 20.9634804725647],
+                [52.19783566318652, 20.96778273582459],
+                [52.1983880521142, 20.973651409149173],
+                [52.19829598776966, 20.983843803405765], //     3_2 rakowiec
+
+                [52.19801979359189, 20.993628501892093],
+                [52.19729641975414, 20.999786853790287],
+                [52.197283267393566, 21.0019326210022],
+                [52.19893714620853, 21.01220011711121], //      1_9 racławicka
+                [52.19955856786872, 21.017982959747318],
+                [52.19983475248429, 21.01972103118897],
+                [52.19984790408986, 21.021287441253666],
+                [52.19976899439816, 21.0263729095459],
+                [52.200005723052904, 21.028218269348148],
+                [52.20054493361488, 21.029484272003177],
+                [52.2013734639241, 21.03319644927979],
+                [52.20179429880062, 21.03542804718018], //      4_6 mokotów
+                [52.20195211085191, 21.036458015441898],
+                [52.20250444861822, 21.049547195434574],
+                [52.205870930368796, 21.063387393951416],
+                [52.207790762789195, 21.066445112228397],
+                [52.2092634547226, 21.066584587097168], //      4_7 siekierki
+                [52.21021673374208, 21.066573858261112],
+                [52.21161703065792, 21.066874265670776],
+                [52.212096934468796, 21.067539453506473],
+                [52.21239276300219, 21.068601608276367],
+                [52.21252424171802, 21.07452392578125],
+                [52.21646842224712, 21.084651947021484],
+                [52.21820375073284, 21.086990833282474],
+                [52.21974182611918, 21.08956575393677],
+                [52.22322530419261, 21.09158277511597],
+                [52.2251881, 21.0918865], //                    2_26 fieldorfa
+                [52.227562838288094, 21.09373927116394],
+                [52.230033728865, 21.09505891799927],
+                [52.234817402722314, 21.09960794448853],
+                [52.23674912488548, 21.106173992156986],
+                [52.2366702807286, 21.10836267471314], //       4_9 witolin
+                [52.23638118428841, 21.122224330902103],
+                [52.23458085953712, 21.126430034637455],
+                [52.234410022008284, 21.132245063781742],
+                [52.23628919866255, 21.13782405853272],
+                [52.237182765244796, 21.1422872543335], //      4_10 gocławek
+                [52.24149265727425, 21.16374492645264],
+                [52.243962772544286, 21.168637275695804],
+                [52.24740493789937, 21.170353889465336],
+                [52.25671846617958, 21.173411607742313], //     4_11 rembertów
+            ]
+        ]
+
+        M6_P = [
+            [
+                [52.19665194950946, 20.8835506439209], //       4_1_6_1 ursus
+                [52.21664590213655, 20.886265039443973], //                    6_2 Połczyńska
+                [52.2185192577187, 20.886447429656986],
+                [52.22160847853898, 20.886865854263306],
+                [52.22720139329709, 20.8896017074585], //                    6_3 chrzanów
+                [52.231702816483164, 20.89158654212952],
+                [52.23581612671831, 20.894536972045902],
+                [52.23787263890294, 20.897530317306522],
+                [52.2383982497308, 20.89879631996155], //                    6_4 lazurowa
+                [52.23952172200268, 20.90183258056641],
+                [52.24430437340781, 20.904879570007328],
+                [52.25218673968776, 20.913462638854984], //     6_5 wat
+                [52.262247858841576, 20.926165580749515], //    6_6 bemowo
+                [52.26361368338272, 20.927410125732425],
+                [52.26579366231238, 20.928225517272953],
+                [52.27084922499633, 20.92676639556885],
+                [52.273028848178434, 20.9250283241272],
+                [52.27467005995956, 20.923504829406742],
+                [52.2770595556613, 20.923204421997074], //      6_7 conrada
+                [52.27960645868741, 20.92305421829224],
+                [52.280367875501064, 20.92329025268555],
+                [52.28330839691839, 20.926895141601566],
+                [52.286537494731036, 20.927367210388187],
+                [52.28930041800942, 20.927935838699344],
+                [52.29075728203807, 20.929861664772037], //     1_23_6_8 Młociny
+                [52.29157756727692, 20.93106865882874],
+                [52.29291624016359, 20.935832262039188],
+                [52.29298186034333, 20.93965172767639],
+                [52.293939903897055, 20.942194461822513], //    6_9 wrzeciono
+                [52.29606589913606, 20.948438644409183],
+                [52.300632506816, 20.94972610473633],
+                [52.303624166872794, 20.959661006927494],
+                [52.304647583122346, 20.960605144500736],
+                [52.30664186477277, 20.961570739746097],
+                [52.31049897042699, 20.961055755615238],
+                [52.31598230399868, 20.95348119735718],
+                [52.31873683244947, 20.951850414276127],
+                [52.31936641488024, 20.950841903686527], //     6_10 tarchomin
+                [52.32345848235523, 20.942366123199466],
+                [52.32575354685468, 20.94056367874146],
+                [52.33234955510532, 20.94148635864258], //      6_11 nowodwory
+            ]
+        ];
+        M7_P = [
+            [
+                [52.24499413636591, 21.00115478038788], // ratusz
+                [52.244856184632084, 21.00422859191895],
+                [52.24440948083675, 21.006503105163578],
+                [52.243752555321144, 21.01096630096436],
+                [52.24266203749291, 21.013262271881107],
+                [52.24136126431274, 21.0139274597168], // plac saski
+                [52.2368330, 21.0167880], // nowy świat
+                [52.23535619082742, 21.01714611053467],
+                [52.2335689661261, 21.0179615020752],
+                [52.23172910082567, 21.020772457122806], // Rondo de Gaullea
+                [52.22999430083975, 21.029098033905033],
+                [52.22835143532774, 21.03240251541138], // solec
+                [52.227050242701075, 21.033775806427006],
+                [52.217073165628314, 21.03763818740845], // łazienki
+                [52.20179429880062, 21.03542804718018], // mokotów
+                [52.18960162399487, 21.053795814514164], // sadyba
+                [52.177708243123874, 21.068043708801273], // nałęczowska
+                [52.17203671713686, 21.073923110961914],
+                [52.16482454474455, 21.074438095092773] // wilanów
+
+            ]
+        ];
+
+        // dodawanie linii do mapy
+        var linia1 = L.polyline(M1, {
+            color: '#0000ff',
+            weight: 5,
+            interactive: false
+        }).addTo(map);
+        var linia2 = L.polyline(M2, {
+            color: '#ff0000',
+            weight: 5,
+            interactive: false
+        }).addTo(map);
+        var linia2_budowa = L.polyline(M2_B, {
+            color: '#ff0000',
+            weight: 5,
+            dashArray: '15 8',
+            interactive: false
+        }).addTo(map);
+        var linia2_projekt = L.polyline(M2_P, {
+            color: '#d32d2d',
+            weight: 5,
+            dashArray: '5 15',
+            interactive: false
+        }).addTo(map);
+        var linia3_projekt = L.polyline(M3_P, {
+            color: '#c52dd3',
+            weight: 5,
+            dashArray: '5 15',
+            interactive: false
+        }).addTo(map);
+        var linia4_projekt = L.polyline(M4_P, {
+            color: '#2dd32d',
+            weight: 5,
+            dashArray: '5 15',
+            interactive: false
+        }).addTo(map);
+        var linia5_projekt = L.polyline(M5_P, {
+            color: '#d0562c',
+            weight: 5,
+            dashArray: '5 15',
+            interactive: false
+        }).addTo(map);
+        var linia6_projekt = L.polyline(M6_P, {
+            color: '#d1d32d',
+            weight: 5,
+            dashArray: '5 15',
+            interactive: false
+        }).addTo(map);
+        var linia7_projekt = L.polyline(M7_P, {
+            color: '#2dd1d3',
+            weight: 5,
+            dashArray: '5 15',
+            interactive: false
+        }).addTo(map);
+    </script>
+</body>
+
+</html>
